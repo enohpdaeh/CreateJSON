@@ -38,7 +38,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 app.use('/users', users);
 
-// /todoにGETアクセスしたとき、JSONを返す
+// /JSONにGETアクセスしたとき、JSONを返す
 app.get('/JSON', function(req, res) {
   res.send(weatherRepo);
 });
