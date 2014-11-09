@@ -10,8 +10,6 @@ var users = require('./routes/users');
 
 var app = express();
 
-var mongoose = require('mongoose');
-
 var YQL = require('yql');
 var query = new YQL('SELECT * FROM weather.bylocation WHERE location="Fujisawa" AND unit="c"');
 var weatherRepo;
