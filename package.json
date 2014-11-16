@@ -13,6 +13,16 @@
     "serve-favicon": "~2.1.3",
     "debug": "~2.0.0",
     "yql": "~1.0.2",
-    "jade": "~1.6.0"
-  }
+    "jade": "~1.6.0",
+    "linda": "~1.2.0",
+    "socket.io-client": "~1.2.0"
+  },
+  "main": "app.js",
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "ssh://github.com/enohpdaeh/CreateJSON.git"
+  },
+  "author": "",
+  "license": "ISC"
 }
