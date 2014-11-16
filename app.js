@@ -70,7 +70,7 @@ function getRec(){
   query.exec(function(err, data) {
     var location = data.query.results.weather.rss.channel.location;
     var condition = data.query.results.weather.rss.channel.item.condition;
-    var temp_light =  ',{"light":"' + light_value + '","temp":"' + temp_value + '","time":"' + now + '"}';
+    var temp_light =  ',{"delta_light":"' + light_value + '","delta_temp":"' + temp_value + '","delta_time":"' + now + '"}';
     weatherRepo = "{\"weather\" :[" + JSON.stringify(location) + "," + JSON.stringify(condition) + temp_light + "]}";
     console.log(weatherRepo);
   });
