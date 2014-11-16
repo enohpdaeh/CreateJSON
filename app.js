@@ -63,12 +63,12 @@ var print = function(msg){
 };
 
 var http = require('http'), fs = require('fs');
-var now = new Date();
 
 //fujisawaの天気を取得してjson化
 function getRec(){
   query.exec(function(err, data) {
     var location = data.query.results.weather.rss.channel.location;
+    var now = new Date();
     var condition = data.query.results.weather.rss.channel.item.condition;
     var temp_light =  ',{"delta_light":"' + light_value + '","delta_temp":"' + temp_value + '","delta_time":"' + now + '"}';
     weatherRepo = "{\"weather\" :[" + JSON.stringify(location) + "," + JSON.stringify(condition) + temp_light + "]}";
