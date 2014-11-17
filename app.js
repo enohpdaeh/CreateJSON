@@ -15,10 +15,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var routes = require('./routes/index');
-var users = require('./routes/users');
-
 var app = express();
 
 var YQL = require('yql');
@@ -38,11 +35,10 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
-app.use('/users', users);
 
 //Lindaから明るさ、温度を取得
 linda.io.on('connect', function(){
-  print('socket.io connect!!');
+  console.log('socket.io connect!!');
 
   ts.read({type:"sensor", name:"light"}, function(err, tuple){
     if(err) return;
@@ -56,11 +52,6 @@ linda.io.on('connect', function(){
   });
 
 });
-
-var print = function(msg){
-  console.log(msg);
-  if(typeof msg === 'object') msg = JSON.stringify(msg);
-};
 
 var http = require('http'), fs = require('fs');
 
