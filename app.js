@@ -1,11 +1,8 @@
 var LindaClient = require('linda').Client;
 var socket = require('socket.io-client').connect('http://linda-server.herokuapp.com/');
+//var socket = require('socket.io-client').connect('http://localhost:8931/');
 var linda = new LindaClient().connect(socket);
-
 var ts = linda.tuplespace('delta');
-var name = "";
-var temp_value = "";
-var light_value = "";
 var http = require('http'), fs = require('fs');
 var now = new Date();
 
@@ -37,32 +34,55 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/', routes);
 
 //Lindaから明るさ、温度を取得
+var tupleType, tupleName;
+var reqArray = [
+  ["sensor", "light"],
+  ["sensor", "temperature"]
+];
+var resArray = [];
+var lindaJOSN = "{";
+var dQ = "\"";
+var coron = ":";
+var canma = ",";
+
+//lindaに接続
 linda.io.on('connect', function(){
   console.log('socket.io connect!!');
-
-  ts.read({type:"sensor", name:"light"}, function(err, tuple){
-    if(err) return;
-    name = tuple.data.name;
-    light_value = tuple.data.value;
-  });
-  ts.read({type:"sensor", name:"temperature"}, function(err, tuple){
-    if(err) return;
-    name = tuple.data.name;
-    temp_value = tuple.data.value;
-  });
-
 });
 
-var http = require('http'), fs = require('fs');
+//reqArrayに入っているkeyでvalueを取得
+function getValue(){
+  for(var i = 0; i < reqArray.length; i++){
+    tupleType = reqArray[i][0];
+    tupleName = reqArray[i][1];
+    ts.read({type:tupleType, name:tupleName}, function(err, tuple){
+      if(err) return;
+      resArray.push(tuple.data.value);
+      console.log(tuple.data.value);
+    });
+  }
+}
+//getvalueで受け取った値をJSON化
+function valueToJSON(){
+  setTimeout(function(){
+    for(var i = 0; i < resArray.length; i++){
+      lindaJOSN = lindaJOSN.concat(dQ + i.toString() + dQ + coron + dQ + resArray[i] + dQ + canma);
+    }
+    lindaJOSN = lindaJOSN.slice(0, -1);
+    lindaJOSN = lindaJOSN.concat("}");
+    console.log(lindaJOSN);
+  },3000);
+}
 
 //fujisawaの天気を取得してjson化
 function getRec(){
   query.exec(function(err, data) {
+    getValue();
+    valueToJSON();
     var location = data.query.results.weather.rss.channel.location;
     var now = new Date();
     var condition = data.query.results.weather.rss.channel.item.condition;
-    var temp_light =  ',{"delta_light":"' + light_value + '","delta_temp":"' + temp_value + '","delta_time":"' + now + '"}';
-    weatherRepo = "{\"weather\" :[" + JSON.stringify(location) + "," + JSON.stringify(condition) + temp_light + "]}";
+    weatherRepo = "{\"weather\" :[" + JSON.stringify(location) + "," + JSON.stringify(condition) + "," + lindaJOSN + "]}";
     console.log(weatherRepo);
   });
 }
