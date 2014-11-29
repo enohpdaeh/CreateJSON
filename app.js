@@ -4,8 +4,6 @@ var socket = require('socket.io-client').connect('http://linda-server.herokuapp.
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
 var http = require('http'), fs = require('fs');
-var now = new Date();
-
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -14,7 +12,6 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var app = express();
-
 var YQL = require('yql');
 var query = new YQL('SELECT * FROM weather.bylocation WHERE location="Fujisawa" AND unit="c"');
 var weatherRepo;
@@ -39,8 +36,7 @@ var reqArray = [
   ["sensor", "light"],
   ["sensor", "temperature"]
 ];
-var resArray = [];
-var lindaJOSN = "{";
+var resArray;
 var dQ = "\"";
 var coron = ":";
 var canma = ",";
@@ -52,6 +48,7 @@ linda.io.on('connect', function(){
 
 //reqArrayに入っているkeyでvalueを取得
 function getValue(){
+  resArray = [];
   for(var i = 0; i < reqArray.length; i++){
     tupleType = reqArray[i][0];
     tupleName = reqArray[i][1];
@@ -62,35 +59,47 @@ function getValue(){
     });
   }
 }
+
+var lindaJSON = "{";
 //getvalueで受け取った値をJSON化
 function valueToJSON(){
   setTimeout(function(){
+    lindaJSON = "{";
     for(var i = 0; i < resArray.length; i++){
-      lindaJOSN = lindaJOSN.concat(dQ + i.toString() + dQ + coron + dQ + resArray[i] + dQ + canma);
+      lindaJSON = lindaJSON.concat(dQ + i.toString() + dQ + coron + dQ + resArray[i] + dQ + canma);
     }
-    lindaJOSN = lindaJOSN.slice(0, -1);
-    lindaJOSN = lindaJOSN.concat("}");
-    console.log(lindaJOSN);
+    lindaJSON = lindaJSON.slice(0, -1);
+    lindaJSON = lindaJSON.concat("}");
+    console.log("lindaJSON is : " + lindaJSON);
   },3000);
 }
 
+var weatherRepo = "";
 //fujisawaの天気を取得してjson化
-function getRec(){
+function getWeather(){
   query.exec(function(err, data) {
-    getValue();
-    valueToJSON();
     var location = data.query.results.weather.rss.channel.location;
     var now = new Date();
     var condition = data.query.results.weather.rss.channel.item.condition;
-    weatherRepo = "{\"weather\" :[" + JSON.stringify(location) + "," + JSON.stringify(condition) + "," + lindaJOSN + "]}";
-    console.log(weatherRepo);
+    weatherRepo = JSON.stringify(location) + "," + JSON.stringify(condition);
+    console.log("weatherRepo is : " + weatherRepo);
   });
+}
+
+var resJSON = "";
+//各種JSONを繋げる
+function getRec(){
+    getValue();
+    getWeather();
+    valueToJSON();
+    resJSON = "{\"weather\" :[" + weatherRepo + "," + lindaJSON + "]}";
+    console.log(resJSON);
 }
 
 // /JSONにGETアクセスしたとき、JSONを返す
 app.get('/JSON', function(req, res) {
   getRec();
-  res.send(weatherRepo);
+  res.send(resJSON);
 });
 
 // catch 404 and forward to error handler
