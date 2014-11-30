@@ -30,6 +30,16 @@ function getSensor(){
     name: "temperature",
     value: "16"
   });
+  ts.write({
+    type: "dummy",
+    name: "dummy01",
+    value: "dummy data 01"
+  });
+  ts.write({
+    type: "dummy",
+    name: "dummy02",
+    value: "dummy data 02"
+  });
 }
 
 //fujisawaの天気を取得してlindaに書き込み

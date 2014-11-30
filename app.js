@@ -36,7 +36,9 @@ var reqArray = [
   ["sensor", "temperature"],
   ["weather", "city"],
   ["weather", "temp"],
-  ["weather", "text"]
+  ["weather", "text"],
+  ["dummy", "dummy01"],
+  ["dummy", "dummy02"]
 ];
 var resArray;
 var dQ = "\"";
