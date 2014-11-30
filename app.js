@@ -12,7 +12,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var app = express();
-var test = require('./test.js');
+var test = require('./write_linda.js');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
