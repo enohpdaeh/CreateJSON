@@ -2,6 +2,7 @@ var LindaClient = require('linda').Client;
 var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
+var dummyTs = linda.tuplespace('dummy');
 var http = require('http'), fs = require('fs');
 var YQL = require('yql');
 var query = new YQL('SELECT * FROM weather.bylocation WHERE location="Fujisawa" AND unit="c"');
@@ -30,12 +31,12 @@ function getSensor(){
     name: "temperature",
     value: "16"
   });
-  ts.write({
+  dummyTs.write({
     type: "dummy",
     name: "dummy01",
     value: "dummy data 01"
   });
-  ts.write({
+  dummyTs.write({
     type: "dummy",
     name: "dummy02",
     value: "dummy data 02"

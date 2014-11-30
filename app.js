@@ -3,6 +3,7 @@ var LindaClient = require('linda').Client;
 var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
+var dummyTs = linda.tuplespace('dummy');
 var http = require('http'), fs = require('fs');
 var express = require('express');
 var path = require('path');
@@ -57,6 +58,11 @@ function getValue(){
     tupleType = reqArray[i][0];
     tupleName = reqArray[i][1];
     ts.read({type:tupleType, name:tupleName}, function(err, tuple){
+      if(err) return;
+      resArray.push(tuple.data.value);
+      console.log(tuple.data.value);
+    });
+    dummyTs.read({type:tupleType, name:tupleName}, function(err, tuple){
       if(err) return;
       resArray.push(tuple.data.value);
       console.log(tuple.data.value);
