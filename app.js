@@ -12,8 +12,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var app = express();
-var YQL = require('yql');
-var query = new YQL('SELECT * FROM weather.bylocation WHERE location="Fujisawa" AND unit="c"');
+var test = require('./test.js');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,6 +28,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 
+test.writeLinda();
 //Lindaから明るさ、温度を取得
 var tupleType, tupleName;
 var reqArray = [
