@@ -1,6 +1,6 @@
 var LindaClient = require('linda').Client;
-var socket = require('socket.io-client').connect('http://linda-server.herokuapp.com/');
-//var socket = require('socket.io-client').connect('http://localhost:8931/');
+//var socket = require('socket.io-client').connect('http://linda-server.herokuapp.com/');
+var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
 var http = require('http'), fs = require('fs');
@@ -14,7 +14,6 @@ var routes = require('./routes/index');
 var app = express();
 var YQL = require('yql');
 var query = new YQL('SELECT * FROM weather.bylocation WHERE location="Fujisawa" AND unit="c"');
-var weatherRepo;
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -34,7 +33,10 @@ app.use('/', routes);
 var tupleType, tupleName;
 var reqArray = [
   ["sensor", "light"],
-  ["sensor", "temperature"]
+  ["sensor", "temperature"],
+  ["weather", "city"],
+  ["weather", "temp"],
+  ["weather", "text"]
 ];
 var resArray;
 var dQ = "\"";
@@ -74,25 +76,12 @@ function valueToJSON(){
   },3000);
 }
 
-var weatherRepo = "";
-//fujisawaの天気を取得してjson化
-function getWeather(){
-  query.exec(function(err, data) {
-    var location = data.query.results.weather.rss.channel.location;
-    var now = new Date();
-    var condition = data.query.results.weather.rss.channel.item.condition;
-    weatherRepo = JSON.stringify(location) + "," + JSON.stringify(condition);
-    console.log("weatherRepo is : " + weatherRepo);
-  });
-}
-
 var resJSON = "";
 //各種JSONを繋げる
 function getRec(){
     getValue();
-    getWeather();
     valueToJSON();
-    resJSON = "{\"weather\" :[" + weatherRepo + "," + lindaJSON + "]}";
+    resJSON = "{\"weather\" :[" + lindaJSON + "]}";
     console.log(resJSON);
 }
 
