@@ -7,7 +7,7 @@ var http = require('http'), fs = require('fs');
 var YQL = require('yql');
 var query = new YQL('SELECT * FROM weather.bylocation WHERE location="Fujisawa" AND unit="c"');
 
-//taple space deltaにweatherを書き込み
+//2秒ごとにタプルスペースに書き込み
 exports.writeLinda = function(){
   //lindaに接続
   linda.io.on('connect', function(){
@@ -20,6 +20,7 @@ exports.writeLinda = function(){
 }
 
 //delta sensorを取得して、lindaに書き込み
+//現状はダミーデータ
 function getSensor(){
   ts.write({
     type: "sensor",
@@ -31,6 +32,10 @@ function getSensor(){
     name: "temperature",
     value: "16"
   });
+}
+
+//タプルスペース"dummy"にダミーデータの書き込み
+function wirteDummy(){
   dummyTs.write({
     type: "dummy",
     name: "dummy01",
@@ -43,7 +48,7 @@ function getSensor(){
   });
 }
 
-//fujisawaの天気を取得してlindaに書き込み
+//YQLでfujisawaの天気を取得してlindaに書き込み
 function getWeather(){
   query.exec(function(err, data) {
     var city = data.query.results.weather.rss.channel.location.city;
