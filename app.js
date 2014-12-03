@@ -3,7 +3,7 @@ var LindaClient = require('linda').Client;
 var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
-var dummyTs = linda.tuplespace('dummy');
+var tsDummy = linda.tuplespace('dummy');
 var http = require('http'), fs = require('fs');
 var express = require('express');
 var path = require('path');
@@ -38,6 +38,8 @@ var reqArray = [
   ["weather", "city"],
   ["weather", "temp"],
   ["weather", "text"],
+  ["odakyu", "time"],
+  ["odakyu", "status"],
   ["dummy", "dummy01"],
   ["dummy", "dummy02"]
 ];
@@ -62,7 +64,7 @@ function getValue(){
       resArray.push(tuple.data.value);
       console.log(tuple.data.value);
     });
-    dummyTs.read({type:tupleType, name:tupleName}, function(err, tuple){
+    tsDummy.read({type:tupleType, name:tupleName}, function(err, tuple){
       if(err) return;
       resArray.push(tuple.data.value);
       console.log(tuple.data.value);

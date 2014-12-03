@@ -2,12 +2,14 @@ var LindaClient = require('linda').Client;
 var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
-var dummyTs = linda.tuplespace('dummy');
+var tsDummy = linda.tuplespace('dummy');
+var tsOdakyu = linda.tuplespace('delta');
 var http = require('http'), fs = require('fs');
 var YQL = require('yql');
 var query = new YQL('SELECT * FROM weather.bylocation WHERE location="Fujisawa" AND unit="c"');
+var request = require('request');
 
-//2秒ごとにタプルスペースに書き込み
+//5秒ごとにタプルスペースに書き込み
 exports.writeLinda = function(){
   //lindaに接続
   linda.io.on('connect', function(){
@@ -16,7 +18,8 @@ exports.writeLinda = function(){
   setInterval(function(){
     getWeather();
     getSensor();
-  },2000);
+    getOdakyuStatus();
+  },5000);
 }
 
 //delta sensorを取得して、lindaに書き込み
@@ -36,12 +39,12 @@ function getSensor(){
 
 //タプルスペース"dummy"にダミーデータの書き込み
 function wirteDummy(){
-  dummyTs.write({
+  tsDummy.write({
     type: "dummy",
     name: "dummy01",
     value: "dummy data 01"
   });
-  dummyTs.write({
+  tsDummy.write({
     type: "dummy",
     name: "dummy02",
     value: "dummy data 02"
@@ -70,3 +73,23 @@ function getWeather(){
     });
   });
 }
+
+//kimono apiから小田急の運行情報を取得してlindaにwrite
+function getOdakyuStatus(){
+  request("https://www.kimonolabs.com/api/94zcgk54?apikey=G3AoDqV8MU2CdL2knzGiEWi7mPBBIvpu",
+  function(err, response, body) {
+    var obj = JSON.parse(body);
+    var resObj = obj.results.collection1[0];
+    tsOdakyu.write({
+      type: "odakyu",
+      name: "time",
+      value: resObj.time
+    });
+    tsOdakyu.write({
+      type: "odakyu",
+      name: "status",
+      value: resObj.status
+    });
+  });
+}
+
