@@ -1,3 +1,4 @@
 .DS_Store
 *.swp
 odakyu.js
+npm-debug.log
