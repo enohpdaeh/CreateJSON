@@ -2,3 +2,21 @@ extends layout
 
 block content
   h1 CreateJSON Server
+  // tuple指定フォーム
+  .form
+    form#form
+      p
+        label(for='tupleType') tupleType
+        input#tupleType(type='text',name='tupleType')
+      p
+        label(for='tupleName') tupleName
+        input#tupleName(type='text',name='tupleName')
+      p
+        input(type='submit', value="add tuple")
+  // 一覧を表示
+  .list
+
+// jquery
+block scripts
+  script(src='http://code.jquery.com/jquery-2.0.0.min.js')
+  script(src='javascripts/tuple.js')
