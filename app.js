@@ -40,6 +40,7 @@ mongoose.model('Tuple', tupleSchema);
 
 // /tupleにアクセスしたとき、tuple一覧を返す
 app.get('/tuple', function(req, res){
+  addTuple();
   var Tuple = mongoose.model('Tuple');
   // すべてのTupleを取得して送る
   Tuple.find({}, function(err, tuples){
@@ -47,7 +48,19 @@ app.get('/tuple', function(req, res){
   });
 });
 
+// tupleを追加
+function addTuple(){
+  var Tuple = mongoose.model('Tuple');
+  var tuple = new Tuple();
+  tuple.tupleType = "sensor";
+  tuple.tupleName = "light";
+  tuple.save();
+}
+
+
+// Lindaに書き込み
 writeLinda.writeLinda();
+
 //Lindaから明るさ、温度を取得
 var tupleType, tupleName;
 var reqArray = [
