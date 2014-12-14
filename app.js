@@ -1,5 +1,4 @@
 var LindaClient = require('linda').Client;
-//var socket = require('socket.io-client').connect('http://linda-server.herokuapp.com/');
 var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
@@ -13,7 +12,9 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var routes = require('./routes/index');
 var app = express();
-var test = require('./write_linda.js');
+var writeLinda = require('./write_linda.js');
+var mongoose = require('mongoose');
+mongoose.connect('mongodb://localhost/createjson');
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -29,7 +30,24 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', routes);
 
-test.writeLinda();
+//Tupleスキーマを定義
+var Schema = mongoose.Schema;
+var tupleSchema = new Schema({
+  tupleType : String,
+  tupleName : String
+});
+mongoose.model('Tuple', tupleSchema);
+
+// /tupleにアクセスしたとき、tuple一覧を返す
+app.get('/tuple', function(req, res){
+  var Tuple = mongoose.model('Tuple');
+  // すべてのTupleを取得して送る
+  Tuple.find({}, function(err, tuples){
+    res.send(tuples);
+  });
+});
+
+writeLinda.writeLinda();
 //Lindaから明るさ、温度を取得
 var tupleType, tupleName;
 var reqArray = [
