@@ -53,7 +53,7 @@ linda.io.on('connect', function(){
   console.log('socket.io connect!!');
 });
 
-//reqArrayに入っているkeyでvalueを取得
+//lindaからreqArrayに入っているkeyでvalueを取得
 function getValue(){
   resArray = [];
   for(var i = 0; i < reqArray.length; i++){
@@ -75,11 +75,17 @@ function getValue(){
 var lindaJSON = "{";
 //getvalueで受け取った値をJSON化
 function valueToJSON(){
+  //lindaからvalueを受け取るまで(getValue()の処理が終わるまで)3秒待つ
+  //受け取るvalueが増えたら時間を伸ばさないといけないかも
   setTimeout(function(){
+    //JSONを初期化
     lindaJSON = "{";
     for(var i = 0; i < resArray.length; i++){
+      //resArrayに入っている値をひとつづつカンマ区切りで追加
+      //keyは"0"からカウントアップ
       lindaJSON = lindaJSON.concat(dQ + i.toString() + dQ + coron + dQ + resArray[i] + dQ + canma);
     }
+    //最後の余計なカンマを除く
     lindaJSON = lindaJSON.slice(0, -1);
     lindaJSON = lindaJSON.concat("}");
     console.log("lindaJSON is : " + lindaJSON);
@@ -91,7 +97,7 @@ var resJSON = "";
 function getRec(){
     getValue();
     valueToJSON();
-    resJSON = "{\"weather\" :[" + lindaJSON + "]}";
+    resJSON = "{\"info\" :[" + lindaJSON + "]}";
     console.log(resJSON);
 }
 
