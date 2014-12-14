@@ -49,6 +49,7 @@ app.get('/tuple', function(req, res){
 });
 
 // tupleを追加
+/*
 function addTuple(){
   var Tuple = mongoose.model('Tuple');
   var tuple = new Tuple();
@@ -56,6 +57,7 @@ function addTuple(){
   tuple.tupleName = "light";
   tuple.save();
 }
+*/
 
 
 // Lindaに書き込み
