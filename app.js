@@ -64,11 +64,14 @@ function getValue(){
       resArray.push(tuple.data.value);
       console.log(tuple.data.value);
     });
+    //別のタプルスペースからreadする例
+    /*
     tsDummy.read({type:tupleType, name:tupleName}, function(err, tuple){
       if(err) return;
       resArray.push(tuple.data.value);
       console.log(tuple.data.value);
     });
+    */
   }
 }
 
