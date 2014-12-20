@@ -1,4 +1,5 @@
 var _ = require('underscore');
+var async = require('async');
 var LindaClient = require('linda').Client;
 var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
@@ -15,12 +16,15 @@ var routes = require('./routes/index');
 var app = express();
 var writeLinda = require('./write_linda.js');
 var mongoose = require('mongoose');
-mongoose.connect(process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/createjson', function(err){
+mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/createjson', function(err){
   if(err){
     console.error(err);
     process.exit(1);
   }
 });
+
+// Lindaに各種情報を書き込み
+writeLinda.writeLinda();
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
@@ -80,20 +84,7 @@ app.post('/remove', function(req, res){
   res.send(true);
 });
 
-/*
-// /removeにアクセスしたとき、tuple一覧を返す
-// 不要かも
-app.get('/remove', function(req, res){
-  var Tuple = mongoose.model('Tuple');
-  // すべてのTupleを取得して送る
-  Tuple.find({}, function(err, tuples){
-    res.send(tuples);
-  });
-});
-*/
 
-// Lindaに各種情報を書き込み
-writeLinda.writeLinda();
 //変数
 var tupleType, tupleName;
 var reqArray = [];  //Lindaにリクエストするtype,name
@@ -122,7 +113,6 @@ function createReqArray(){
       reqArray.push(arr);
     });
   });
-  console.log(reqArray);
 }
 
 //LindaからreqArrayに入っているkeyでvalueを取得
@@ -136,50 +126,53 @@ function getValue(){
       resArray.push(tuple.data.value);
       console.log(tuple.data.value);
     });
-    //別のタプルスペースからreadする例
-    /*
-    tsDummy.read({type:tupleType, name:tupleName}, function(err, tuple){
-      if(err) return;
-      resArray.push(tuple.data.value);
-      console.log(tuple.data.value);
-    });
-    */
   }
 }
 
 //getvalueで受け取った値をJSON化
 function valueToJSON(){
-  //lindaからvalueを受け取るまで(getValue()の処理が終わるまで)3秒待つ
-  //受け取るvalueが増えたら時間を伸ばさないといけないかも
-  setTimeout(function(){
-    //JSONを初期化
-    lindaJSON = "{";
-    for(var i = 0; i < resArray.length; i++){
-      //resArrayに入っている値をひとつづつカンマ区切りで追加
-      //keyは"0"からカウントアップ
-      lindaJSON = lindaJSON.concat(dQ + i.toString() + dQ + coron + dQ + resArray[i] + dQ + canma);
-    }
-    //最後の余計なカンマを除く
-    lindaJSON = lindaJSON.slice(0, -1);
-    lindaJSON = lindaJSON.concat("}");
-    console.log("lindaJSON is : " + lindaJSON);
-  },3000);
-}
-
-//各種JSONを繋げる
-function getRec(){
-  getValue();
-  valueToJSON();
-  resJSON = "{\"info\" :[" + lindaJSON + "]}";
-  console.log(resJSON);
+  //JSONを初期化
+  lindaJSON = "{";
+  for(var i = 0; i < resArray.length; i++){
+    //resArrayに入っている値をひとつづつカンマ区切りで追加
+    //keyは"0"からカウントアップ
+    lindaJSON = lindaJSON.concat(dQ + i.toString() + dQ + coron + dQ + resArray[i] + dQ + canma);
+  }
+  //最後の余計なカンマを除く
+  lindaJSON = lindaJSON.slice(0, -1);
+  lindaJSON = lindaJSON.concat("}");
+  console.log("lindaJSON is : " + lindaJSON);
 }
 
 // /JSONにGETアクセスしたとき、JSONを返す
 app.get('/JSON', function(req, res) {
-  createReqArray();
-  getRec();
-  res.send(resJSON);
-  reqArray = [];
+  async.waterfall(
+    [
+    function(callback){
+      createReqArray();
+      setTimeout(function(){
+        console.log(reqArray);
+        callback(null);
+      },1000);
+    },
+    function(callback){
+      getValue();
+      setTimeout(function(){
+        callback(null);
+      },1000);
+    },
+    function(callback){
+      valueToJSON();
+      setTimeout(function(){
+        callback(null);
+      },1000);
+    }
+  ], function(){
+    resJSON = "{\"info\" :[" + lindaJSON + "]}";
+    res.send(resJSON);
+    console.log(resJSON);
+    reqArray = [];
+  });
 });
 
 // catch 404 and forward to error handler
