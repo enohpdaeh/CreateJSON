@@ -8,6 +8,13 @@ $('#form').submit(function(){
   postList();
   return false;
 });
+// 削除ボタンを押した時の挙動
+$('#remove').click(function(){
+  $.post('/remove', function(res){
+    console.log(res);
+  });
+  return true;
+});
 
 // ToDo一覧を取得して表示する
 function getList(){
@@ -25,8 +32,6 @@ function getList(){
       $list.fadeIn();
     });
   });
-
-
 }
 
 // フォームに入力されたToDoを追加する

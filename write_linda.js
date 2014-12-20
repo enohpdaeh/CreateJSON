@@ -78,19 +78,23 @@ function getWeather(){
 function getOdakyuStatus(){
   request("https://www.kimonolabs.com/api/94zcgk54?apikey=G3AoDqV8MU2CdL2knzGiEWi7mPBBIvpu",
   function(err, response, body) {
-    console.log(body);
-    var obj = JSON.parse(body);
-    var resObj = obj.results.collection1[0];
-    tsOdakyu.write({
-      type: "odakyu",
-      name: "time",
-      value: resObj.time
-    });
-    tsOdakyu.write({
-      type: "odakyu",
-      name: "status",
-      value: resObj.status
-    });
+    //console.log(body);
+    try{
+      var obj = JSON.parse(body);
+      var resObj = obj.results.collection1[0];
+      tsOdakyu.write({
+        type: "odakyu",
+        name: "time",
+        value: resObj.time
+      });
+      tsOdakyu.write({
+        type: "odakyu",
+        name: "status",
+        value: resObj.status
+      });
+    }catch(e){
+      console.log(e);
+    }
   });
 }
 

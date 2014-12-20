@@ -40,7 +40,6 @@ mongoose.model('Tuple', tupleSchema);
 
 // /tupleにアクセスしたとき、tuple一覧を返す
 app.get('/tuple', function(req, res){
-  addTuple();
   var Tuple = mongoose.model('Tuple');
   // すべてのTupleを取得して送る
   Tuple.find({}, function(err, tuples){
@@ -48,22 +47,47 @@ app.get('/tuple', function(req, res){
   });
 });
 
-// tupleを追加
-/*
-function addTuple(){
-  var Tuple = mongoose.model('Tuple');
-  var tuple = new Tuple();
-  tuple.tupleType = "sensor";
-  tuple.tupleName = "light";
-  tuple.save();
-}
-*/
+// /tupleにpostがきたらtupleを追加
+app.post('/tuple', function(req, res){
+  var name = req.body.name;
+  var type = req.body.type;
+  // nameとtypeがあればmongoに追加
+  if(name && type){
+    var Tuple = mongoose.model('Tuple');
+    var tuple = new Tuple();
+    tuple.tupleType = type;
+    tuple.tupleName = name;
+    tuple.save();
 
+    res.send(true);
+  }else{
+    res.send(false);
+  }
+});
+
+// /removeにpostしたら全要素削除
+app.post('/remove', function(res){
+  // 削除
+  var Tuple = mongoose.model('Tuple');
+  Tuple.remove({},function(err){
+    //
+  });
+  res.send(true);
+});
+
+// /removeにアクセスしたとき、tuple一覧を返す
+app.get('/remove', function(req, res){
+  var Tuple = mongoose.model('Tuple');
+  // すべてのTupleを取得して送る
+  Tuple.find({}, function(err, tuples){
+    res.send(tuples);
+  });
+});
 
 // Lindaに書き込み
 writeLinda.writeLinda();
 
-//Lindaから明るさ、温度を取得
+//Lindaからvalueを取得
 var tupleType, tupleName;
 var reqArray = [
   ["sensor", "light"],
