@@ -18,7 +18,8 @@
     "socket.io-client": "~1.2.0",
     "yql": "~1.0.2",
     "request": "2.48.0",
-    "mongoose": "3.8.20"
+    "mongoose": "3.8.20",
+    "underscore": "1.7.0"
   },
   "engine": {
     "node": "v0.10.33",

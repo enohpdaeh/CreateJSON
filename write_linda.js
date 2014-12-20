@@ -9,6 +9,8 @@ var YQL = require('yql');
 var query = new YQL('SELECT * FROM weather.bylocation WHERE location="Fujisawa" AND unit="c"');
 var request = require('request');
 
+var interval = 5000;
+
 //5秒ごとにタプルスペースに書き込み
 exports.writeLinda = function(){
   //lindaに接続
@@ -19,7 +21,7 @@ exports.writeLinda = function(){
     getWeather();
     getSensor();
     getOdakyuStatus();
-  },5000);
+  },interval);
 }
 
 //delta sensorを取得して、lindaに書き込み
@@ -94,6 +96,7 @@ function getOdakyuStatus(){
       });
     }catch(e){
       console.log(e);
+      interval = interval * 2;
     }
   });
 }

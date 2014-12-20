@@ -1,3 +1,4 @@
+var _ = require('underscore');
 var LindaClient = require('linda').Client;
 var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
@@ -14,7 +15,6 @@ var routes = require('./routes/index');
 var app = express();
 var writeLinda = require('./write_linda.js');
 var mongoose = require('mongoose');
-//mongoose.connect('mongodb://localhost/createjson');
 mongoose.connect(process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/createjson', function(err){
   if(err){
     console.error(err);
@@ -82,6 +82,7 @@ app.post('/remove', function(res){
 });
 
 // /removeにアクセスしたとき、tuple一覧を返す
+// 不要かも
 app.get('/remove', function(req, res){
   var Tuple = mongoose.model('Tuple');
   // すべてのTupleを取得して送る
@@ -90,23 +91,15 @@ app.get('/remove', function(req, res){
   });
 });
 
-// Lindaに書き込み
+// Lindaに各種情報を書き込み
 writeLinda.writeLinda();
-
-//Lindaからvalueを取得
+//変数
 var tupleType, tupleName;
-var reqArray = [
-  ["sensor", "light"],
-  ["sensor", "temperature"],
-  ["weather", "city"],
-  ["weather", "temp"],
-  ["weather", "text"],
-  ["odakyu", "time"],
-  ["odakyu", "status"],
-  ["dummy", "dummy01"],
-  ["dummy", "dummy02"]
-];
-var resArray;
+var reqArray = [];  //Lindaにリクエストするtype,name
+var resArray; //Lindaから返ってきたvalue
+var lindaJSON = "{";  //resArrayをJSON形式にしたもの
+var resJSON = ""; //Androidに送るJSON
+//定数
 var dQ = "\"";
 var coron = ":";
 var canma = ",";
@@ -116,7 +109,22 @@ linda.io.on('connect', function(){
   console.log('socket.io connect!!');
 });
 
-//lindaからreqArrayに入っているkeyでvalueを取得
+// Lindaにリクエストするtypeとnameの組み合わせreqArrayの作成
+// reqArray = [[tupleType,tupleName],[tupleType,tupleName]..]
+function createReqArray(){
+  var Tuple = mongoose.model('Tuple');
+  Tuple.find({},function(err, tuples){
+    _.each(tuples, function(tuple, index){
+      var arr = [];
+      arr.push(tuple.tupleType);
+      arr.push(tuple.tupleName);
+      reqArray.push(arr);
+    });
+  });
+  console.log(reqArray);
+}
+
+//LindaからreqArrayに入っているkeyでvalueを取得
 function getValue(){
   resArray = [];
   for(var i = 0; i < reqArray.length; i++){
@@ -138,7 +146,6 @@ function getValue(){
   }
 }
 
-var lindaJSON = "{";
 //getvalueで受け取った値をJSON化
 function valueToJSON(){
   //lindaからvalueを受け取るまで(getValue()の処理が終わるまで)3秒待つ
@@ -158,19 +165,20 @@ function valueToJSON(){
   },3000);
 }
 
-var resJSON = "";
 //各種JSONを繋げる
 function getRec(){
-    getValue();
-    valueToJSON();
-    resJSON = "{\"info\" :[" + lindaJSON + "]}";
-    console.log(resJSON);
+  getValue();
+  valueToJSON();
+  resJSON = "{\"info\" :[" + lindaJSON + "]}";
+  console.log(resJSON);
 }
 
 // /JSONにGETアクセスしたとき、JSONを返す
 app.get('/JSON', function(req, res) {
+  createReqArray();
   getRec();
   res.send(resJSON);
+  reqArray = [];
 });
 
 // catch 404 and forward to error handler
