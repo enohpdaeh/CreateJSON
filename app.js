@@ -159,13 +159,13 @@ app.get('/JSON', function(req, res) {
       getValue();
       setTimeout(function(){
         callback(null);
-      },1000);
+      },2000);
     },
     function(callback){
       valueToJSON();
       setTimeout(function(){
         callback(null);
-      },1000);
+      },2000);
     }
   ], function(){
     resJSON = "{\"info\" :[" + lindaJSON + "]}";
