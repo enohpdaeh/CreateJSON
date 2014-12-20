@@ -8,11 +8,13 @@ $('#form').submit(function(){
   postList();
   return false;
 });
+
 // 削除ボタンを押した時の挙動
 $('#remove').click(function(){
   $.post('/remove', function(res){
     console.log(res);
   });
+  getList();
   return true;
 });
 

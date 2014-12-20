@@ -72,15 +72,15 @@ app.post('/tuple', function(req, res){
 });
 
 // /removeにpostしたら全要素削除
-app.post('/remove', function(res){
+app.post('/remove', function(req, res){
   // 削除
   var Tuple = mongoose.model('Tuple');
   Tuple.remove({},function(err){
-    //
   });
   res.send(true);
 });
 
+/*
 // /removeにアクセスしたとき、tuple一覧を返す
 // 不要かも
 app.get('/remove', function(req, res){
@@ -90,6 +90,7 @@ app.get('/remove', function(req, res){
     res.send(tuples);
   });
 });
+*/
 
 // Lindaに各種情報を書き込み
 writeLinda.writeLinda();
