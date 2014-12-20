@@ -14,7 +14,13 @@ var routes = require('./routes/index');
 var app = express();
 var writeLinda = require('./write_linda.js');
 var mongoose = require('mongoose');
-mongoose.connect('mongodb://localhost/createjson');
+//mongoose.connect('mongodb://localhost/createjson');
+mongoose.connect(process.env.MONGOLAB_URI || process.env.MONGOHQ_URL || 'mongodb://localhost/createjson', function(err){
+  if(err){
+    console.error(err);
+    process.exit(1);
+  }
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
