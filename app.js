@@ -23,22 +23,19 @@ mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/createjson', f
   }
 });
 
+//変数
+var tupleType, tupleName;
+var reqArray = [];  //Lindaにリクエストするtype,name
+var resArray; //Lindaから返ってきたvalue
+var lindaJSON = "{";  //resArrayをJSON形式にしたもの
+var resJSON = ""; //Androidに送るJSON
+//定数
+var dQ = "\"";
+var coron = ":";
+var canma = ",";
+
 // Lindaに各種情報を書き込み
 writeLinda.writeLinda();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', routes);
 
 //Tupleスキーマを定義
 var Schema = mongoose.Schema;
@@ -84,17 +81,6 @@ app.post('/remove', function(req, res){
   res.send(true);
 });
 
-
-//変数
-var tupleType, tupleName;
-var reqArray = [];  //Lindaにリクエストするtype,name
-var resArray; //Lindaから返ってきたvalue
-var lindaJSON = "{";  //resArrayをJSON形式にしたもの
-var resJSON = ""; //Androidに送るJSON
-//定数
-var dQ = "\"";
-var coron = ":";
-var canma = ",";
 
 //lindaに接続
 linda.io.on('connect', function(){
@@ -174,6 +160,21 @@ app.get('/JSON', function(req, res) {
     reqArray = [];
   });
 });
+
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+// uncomment after placing your favicon in /public
+//app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', routes);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
