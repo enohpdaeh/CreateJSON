@@ -2,7 +2,6 @@ var LindaClient = require('linda').Client;
 var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
-var tsDummy = linda.tuplespace('dummy');
 var tsOdakyu = linda.tuplespace('delta');
 var http = require('http'), fs = require('fs');
 var YQL = require('yql');
@@ -36,20 +35,6 @@ function getSensor(){
     type: "sensor",
     name: "temperature",
     value: "16"
-  });
-}
-
-//タプルスペース"dummy"にダミーデータの書き込み
-function wirteDummy(){
-  tsDummy.write({
-    type: "dummy",
-    name: "dummy01",
-    value: "dummy data 01"
-  });
-  tsDummy.write({
-    type: "dummy",
-    name: "dummy02",
-    value: "dummy data 02"
   });
 }
 

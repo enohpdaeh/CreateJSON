@@ -4,7 +4,6 @@ var LindaClient = require('linda').Client;
 var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.com/');
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
-var tsDummy = linda.tuplespace('dummy');
 var http = require('http'), fs = require('fs');
 var express = require('express');
 var path = require('path');
