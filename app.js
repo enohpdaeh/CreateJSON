@@ -11,9 +11,13 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+
 var routes = require('./routes/index');
+
 var app = express();
+
 var writeLinda = require('./write_linda.js');
+
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/createjson', function(err){
   if(err){
@@ -55,6 +59,7 @@ app.get('/tuple', function(req, res){
 
 // /tupleにpostがきたらtupleを追加
 app.post('/tuple', function(req, res){
+  console.log(req);
   var name = req.body.name;
   var type = req.body.type;
   // nameとtypeがあればmongoに追加
