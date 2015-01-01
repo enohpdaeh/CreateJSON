@@ -5,18 +5,15 @@ var socket = require('socket.io-client').connect('http://nkym-linda.herokuapp.co
 var linda = new LindaClient().connect(socket);
 var ts = linda.tuplespace('delta');
 var http = require('http'), fs = require('fs');
-
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-
 var routes = require('./routes/index');
-
+var app = express();
 var writeLinda = require('./write_linda.js');
-
 var mongoose = require('mongoose');
 mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/createjson', function(err){
   if(err){
@@ -24,8 +21,6 @@ mongoose.connect(process.env.MONGOLAB_URI || 'mongodb://localhost/createjson', f
     process.exit(1);
   }
 });
-
-var app = express();
 
 //変数
 var tupleType, tupleName;
@@ -40,20 +35,6 @@ var canma = ",";
 
 // Lindaに各種情報を書き込み
 writeLinda.writeLinda();
-
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-// uncomment after placing your favicon in /public
-//app.use(favicon(__dirname + '/public/favicon.ico'));
-app.use(logger('dev'));
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.use('/', routes);
 
 //Tupleスキーマを定義
 var Schema = mongoose.Schema;
@@ -98,6 +79,7 @@ app.post('/remove', function(req, res){
   });
   res.send(true);
 });
+
 
 //lindaに接続
 linda.io.on('connect', function(){
@@ -178,6 +160,20 @@ app.get('/JSON', function(req, res) {
   });
 });
 
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'jade');
+
+// uncomment after placing your favicon in /public
+//app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.use('/', routes);
+
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -209,6 +205,5 @@ app.use(function(err, req, res, next) {
         error: {}
     });
 });
-
 
 module.exports = app;
