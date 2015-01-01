@@ -20,6 +20,7 @@ exports.writeLinda = function(){
     getWeather();
     getSensor();
     getOdakyuStatus();
+    getNexus6Stock();
   },interval);
 }
 
@@ -86,3 +87,26 @@ function getOdakyuStatus(){
   });
 }
 
+//kimono apiからNexus6の在庫情報を
+function getNexus6Stock(){
+  request("https://www.kimonolabs.com/api/d8m9msmq?apikey=G3AoDqV8MU2CdL2knzGiEWi7mPBBIvpu",
+  function(err, response, body) {
+    try{
+      var obj = JSON.parse(body);
+      var resObj = obj.results.nexus6_32G_Blue[0];
+      tsOdakyu.write({
+        type: "nexus6",
+        name: "price",
+        value: resObj.price
+      });
+      tsOdakyu.write({
+        type: "nexus6",
+        name: "stock",
+        value: resObj.stock
+      });
+    }catch(e){
+      console.log(e);
+      interval = interval * 2;
+    }
+  });
+}
